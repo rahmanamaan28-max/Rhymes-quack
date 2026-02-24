@@ -1,0 +1,27 @@
+body{
+  margin:0;
+  font-family:Arial;
+  background:#111;
+  color:white;
+  text-align:center;
+}
+.player{
+  background:#333;
+  margin:6px;
+  padding:6px;
+  border-radius:6px;
+}
+.chuck{
+  background:gold;
+  color:black;
+}
+.float{
+  position:absolute;
+  right:10px;
+  animation:up 1s forwards;
+  color:#4caf50;
+}
+@keyframes up{
+  from{opacity:1; transform:translateY(0);}
+  to{opacity:0; transform:translateY(-20px);}
+}
