@@ -62,6 +62,14 @@ function start(){
   socket.emit("start_game",{code:roomCode});
 }
 
+function setMode(mode){
+  let rounds=5;
+  if(mode==="rounds"){
+    rounds=document.getElementById("roundInput")?.value||5;
+  }
+  socket.emit("set_mode",{code:roomCode,mode,rounds});
+}
+
 socket.on("phase",room=>{
   submitted=false;
   render(`
