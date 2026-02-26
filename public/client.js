@@ -35,9 +35,26 @@ socket.on("room_created",code=>{
 
 socket.on("room_update",room=>{
   render(`
-  Room: ${roomCode}
+  <h3>Room: ${roomCode}</h3>
+
+  <div>
+    <button onclick="setMode('points')">Points</button>
+    <button onclick="setMode('rounds')">Rounds</button>
+    <button onclick="setMode('survival')">Survival</button>
+  </div>
+
+  ${room.mode==="rounds" ? `
+    <input id="roundInput" placeholder="Rounds (5)"/>
+  `:""}
+
   <button onclick="start()">Start</button>
-  ${room.players.map(p=>`<div class="player">${p.avatar} ${p.username}</div>`).join("")}
+
+  ${room.players.map(p=>`
+    <div class="player">
+      ${p.avatar} ${p.username} 
+      ${room.mode==="survival" ? `| ❤️ ${p.lives}`:""}
+    </div>
+  `).join("")}
   `);
 });
 
