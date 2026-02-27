@@ -10,11 +10,10 @@ app.use(express.static("public"));
 
 const rooms = {};
 
-const AVATARS = ["🦊","🐼","🐵","🐸","🦁","🐯","🐨","🐰","🐻","🦄"];
-
 const WORDS = [
-  "CAT","DOG","SUN","MOON","CAR","STAR","TREE","BALL","BOOK","FISH",
-  "RIVER","FLOWER","ORANGE","PURPLE","HUNGER","MARKET"
+  "CAT","DOG","SUN","MOON","CAR","STAR","TREE",
+  "BALL","BOOK","FISH","RIVER","FLOWER",
+  "ORANGE","PURPLE","HUNGER","MARKET"
 ];
 
 function generateRoomCode(){
@@ -100,7 +99,6 @@ function finishRound(code){
         p.lives--;
         if(p.lives<=0) p.eliminated=true;
       }
-
       return;
     }
 
@@ -138,19 +136,16 @@ function handleModeEnd(code){
   const room=rooms[code];
   if(!room) return;
 
-  // POINTS MODE
   if(room.mode==="points"){
     const winner=room.players.find(p=>p.score>=20);
     if(winner) return endGame(code);
   }
 
-  // ROUNDS MODE
   if(room.mode==="rounds"){
     if(room.currentRound>=room.maxRounds)
       return endGame(code);
   }
 
-  // SURVIVAL MODE
   if(room.mode==="survival"){
     const alive=getAlive(room);
     if(alive.length<=1)
@@ -172,7 +167,7 @@ function endGame(code){
 
 io.on("connection",socket=>{
 
-  socket.on("create_room",({username,avatar})=>{
+  socket.on("create_room",({username})=>{
     const code=generateRoomCode();
 
     rooms[code]={
@@ -188,18 +183,18 @@ io.on("connection",socket=>{
     rooms[code].players.push({
       id:socket.id,
       username,
-      avatar:avatar||AVATARS[Math.floor(Math.random()*AVATARS.length)],
       score:0,
       streak:0,
       lives:5,
-      eliminated:false
+      eliminated:false,
+      isChuck:false
     });
 
     socket.emit("room_created",code);
     io.to(code).emit("room_update",rooms[code]);
   });
 
-  socket.on("join_room",({code,username,avatar})=>{
+  socket.on("join_room",({code,username})=>{
     const room=rooms[code];
     if(!room) return;
 
@@ -208,11 +203,11 @@ io.on("connection",socket=>{
     room.players.push({
       id:socket.id,
       username,
-      avatar:avatar||AVATARS[Math.floor(Math.random()*AVATARS.length)],
       score:0,
       streak:0,
       lives:5,
-      eliminated:false
+      eliminated:false,
+      isChuck:false
     });
 
     io.to(code).emit("room_update",room);
@@ -223,8 +218,10 @@ io.on("connection",socket=>{
     if(!room) return;
 
     room.mode=mode;
-    if(mode==="rounds")
+
+    if(mode==="rounds"){
       room.maxRounds=parseInt(rounds)||5;
+    }
 
     io.to(code).emit("room_update",room);
   });
@@ -251,4 +248,4 @@ io.on("connection",socket=>{
 
 });
 
-server.listen(3000,()=>console.log("Running on 3000"));
+server.listen(3000,()=>console.log("Server running on 3000"));
